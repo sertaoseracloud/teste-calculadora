@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .calculator-display {
+            width: 100%;
+            height: 50px;
+            background-color: #222;
+            color: #fff;
+            text-align: right;
+            padding: 10px;
+            font-size: 2em;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .calculator-keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .calculator-keys button {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+        }
+        .calculator-keys button.operator {
+            background-color: #FF9500;
+        }
+        .calculator-keys button.equal {
+            background-color: #28A745;
+            grid-column: span 2;
+        }
+        .calculator-keys button.clear {
+            background-color: #DC3545;
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="calculator-display" id="display">0</div>
+        <div class="calculator-keys">
+            <button class="clear" id="clear">C</button>
+            <button class="operator" id="divide">/</button>
+            <button class="operator" id="multiply">*</button>
+            <button id="7">7</button>
+            <button id="8">8</button>
+            <button id="9">9</button>
+            <button class="operator" id="subtract">-</button>
+            <button id="4">4</button>
+            <button id="5">5</button>
+            <button id="6">6</button>
+            <button class="operator" id="add">+</button>
+            <button id="1">1</button>
+            <button id="2">2</button>
+            <button id="3">3</button>
+            <button class="equal" id="equal">=</button>
+            <button id="0">0</button>
+            <button id="dot">.</button>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        const keys = document.querySelector('.calculator-keys');
+        let displayValue = '0';
+        let firstValue = null;
+        let operator = null;
+        let waitingForSecondValue = false;
+
+        keys.addEventListener('click', function(event) {
+            const element = event.target;
+            if (!element.matches('button')) return;
+
+            if (element.classList.contains('operator')) {
+                handleOperator(element.id);
+                updateDisplay();
+                return;
+            }
+
+            if (element.classList.contains('equal')) {
+                handleEqual();
+                updateDisplay();
+                return;
+            }
+
+            if (element.classList.contains('clear')) {
+                clear();
+                updateDisplay();
+                return;
+            }
+
+            inputDigit(element.id);
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            display.textContent = displayValue;
+        }
+
+        function inputDigit(digit) {
+            if (waitingForSecondValue) {
+                displayValue = digit;
+                waitingForSecondValue = false;
+            } else {
+                displayValue = displayValue === '0' ? digit : displayValue + digit;
+            }
+        }
+
+        function handleOperator(nextOperator) {
+            const value = parseFloat(displayValue);
+
+            if (operator && waitingForSecondValue) {
+                operator = nextOperator;
+                return;
+            }
+
+            if (firstValue === null) {
+                firstValue = value;
+            } else if (operator) {
+                const result = calculate(firstValue, value, operator);
+                displayValue = `${parseFloat(result.toFixed(7))}`;
+                firstValue = result;
+            }
+
+            waitingForSecondValue = true;
+            operator = nextOperator;
+        }
+
+        function calculate(first, second, operator) {
+            if (operator === 'add') return first + second;
+            if (operator === 'subtract') return first - second;
+            if (operator === 'multiply') return first * second;
+            if (operator === 'divide') return first / second;
+            return second;
+        }
+
+        function handleEqual() {
+            const value = parseFloat(displayValue);
+
+            if (operator && waitingForSecondValue) {
+                operator = null;
+                return;
+            }
+
+            if (firstValue !== null && operator) {
+                const result = calculate(firstValue, value, operator);
+                displayValue = `${parseFloat(result.toFixed(7))}`;
+                firstValue = null;
+                operator = null;
+                waitingForSecondValue = false;
+            }
+        }
+
+        function clear() {
+            displayValue = '0';
+            firstValue = null;
+            operator = null;
+            waitingForSecondValue = false;
+        }
+    </script>
+</body>
+</html>

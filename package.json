@@ -1,0 +1,17 @@
+{
+  "name": "repo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@cucumber/cucumber": "^11.2.0",
+    "chromedriver": "^134.0.0",
+    "selenium-webdriver": "^4.29.0"
+  }
+}
